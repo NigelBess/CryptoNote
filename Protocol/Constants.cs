@@ -7,5 +7,6 @@ namespace Protocol
     public static class Constants
     {
         public const ushort ProtocolVersion = 1;
+        public const string fileExtension = ".cryptonote";
     }
 }

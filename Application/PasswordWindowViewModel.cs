@@ -24,17 +24,6 @@ namespace Application
             }
         }
 
-        private string _currentError;
-        public string CurrentError
-        {
-            get => _currentError;
-            set
-            {
-                _currentError = value;
-                OnChange();
-            }
-        }
-
         public Visibility CurrentPasswordVisibility => CurrentPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
 
         public ICommand ChangePassword { get; set; }

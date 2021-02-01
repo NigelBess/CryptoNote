@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET5_0;NETCOREAPP
 C:\Dev\CryptoNote\Application\App.xaml
-21516755026
+3-890435636
 
-18-418291235
+19944339696
 194641648207
-MainWindow.xaml;PasswordWindow.xaml;
+MainWindow.xaml;PasswordWindow.xaml;ValidationControl.xaml;
 
-False
+True
 

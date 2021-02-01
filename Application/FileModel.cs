@@ -30,6 +30,7 @@ namespace Application
         }
 
 
+
         public readonly EncryptedString Text = new();
 
         public readonly EncryptedString Password = new();
@@ -42,6 +43,7 @@ namespace Application
         public FileModel()
         {
             Text.ContentsChanged += ContentsChanged;
+            Text.ContentsChanged += () => OnChange(nameof(Text));
             Password.ContentsChanged += ContentsChanged;
         }
 

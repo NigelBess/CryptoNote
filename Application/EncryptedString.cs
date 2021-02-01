@@ -28,7 +28,7 @@ namespace Application
 
         public void TakeValue(EncryptedString other)
         {
-            Cipher = other.Cipher;
+            PlainText = other.PlainText;
         }
 
         public byte[] PlainText

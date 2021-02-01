@@ -1,4 +1,5 @@
 ﻿
+using System.Windows;
 using System.Windows.Input;
 using Protocol;
 
@@ -11,8 +12,55 @@ namespace Application
         public string Text
         {
             get => _fileModel?.Text.PlainText.ToText();
-            set => _fileModel.Text.PlainText = value.ToBytes();
+            set
+            {
+                if (_fileModel?.Text == null) return;
+                _fileModel.Text.PlainText = value.ToBytes();
+            }
         }
+        private Visibility _validationVisibility;
+
+        public Visibility ValidationVisibility
+        {
+            get => _validationVisibility;
+            set
+            {
+                _validationVisibility = value;
+                OnChange();
+            }
+        }
+
+        private Visibility _textVisibility;
+
+        public Visibility TextVisibility
+        {
+            get => _textVisibility;
+            set
+            {
+                _textVisibility = value;
+                OnChange();
+            }
+        }
+        public bool Locked
+        {
+            set
+            {
+                if (value)
+                {
+                    ValidationVisibility = Visibility.Visible;
+                    TextVisibility = Visibility.Hidden;
+                }
+                else
+                {
+                    TextVisibility = Visibility.Visible;
+                    ValidationVisibility = Visibility.Hidden;
+                }
+            }
+        }
+
+        public ICommand CreateNew { get; set; }
+
+        public ICommand Lock { get; set; }
 
         private FileModel _fileModel;
 
@@ -24,7 +72,6 @@ namespace Application
                 if (_fileModel != null) Unbind(_fileModel);
                 _fileModel = value;
                 BindFileModel(value);
-                OnChange();
             }
         }
 
@@ -34,7 +81,8 @@ namespace Application
 
         private void BindFileModel(FileModel model)
         {
-            //Bind(model, nameof(FileModel.Text),nameof(Text));
+            if (model == null) return;
+            Bind(model, nameof(FileModel.Text),nameof(Text));
             Bind(model, nameof(FileModel.Name), nameof(FileName));
             Bind(model, nameof(FileModel.Saved), nameof(FileName));
         }

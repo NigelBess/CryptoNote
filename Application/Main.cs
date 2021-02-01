@@ -18,6 +18,7 @@ namespace Application
         private readonly PasswordWindowViewModel _passwordViewModel = new();
 
         private FileModel _fileModel;
+        private CryptoNote _note;
 
         public void Start()
         {
@@ -31,8 +32,62 @@ namespace Application
         public void SetupViewModels()
         {
             _passwordViewModel.ChangePassword = new Command(UserConfirmedPassword, UserCanConfirmPassword);
-            _viewModel.ChangePassword = new Command(()=>CreatePassword(ChangePasswordOfExistingFile));
-            _viewModel.Save = new Command(Save);
+            _viewModel.ChangePassword = new Command(()=>CreatePassword(ChangePasswordOfExistingFile), IsUnlocked);
+            _viewModel.CreateNew = new Command(CreateNewFile);
+            _viewModel.Lock = new Command(Lock, IsUnlocked);
+            _viewModel.Save = new Command(Save, IsUnlocked);
+        }
+
+        private bool IsLocked() => _fileModel == null;
+        private bool IsUnlocked() => !IsLocked();
+
+        private void WipeFileModel()
+        {
+            _fileModel.Password.Wipe();
+            _fileModel.Text.Wipe();
+            _viewModel.FileModel = null;
+            _fileModel = null;
+            _viewModel.Text = null;
+            _viewModel.Locked = true;
+        }
+
+        private void Lock()
+        {
+            
+            byte[] message = null;
+            byte[] password = null;
+            try
+            {
+                if (!_fileModel.Password.IsDefined)
+                {
+                    CreatePassword(()=>
+                    {
+                        _fileModel.SwapToTentativePassword();
+                        Lock();
+                    });
+                    return;
+                }
+
+                if (!_fileModel.Text.IsDefined)
+                {
+                    OnError("There is no text to encrypt!");
+                    return;
+                }
+                message = _fileModel.Text.PlainText;
+                password = _fileModel.Password.PlainText;
+                _note = new CryptoNote(UserSettings.Default.Iterations);
+                _note.Encrypt(message, password);
+                WipeFileModel();
+            }
+            catch (Exception e)
+            {
+                OnError(e);
+            }
+            finally
+            {
+                message?.Wipe();
+                password?.Wipe();
+            }
         }
 
         private void UserConfirmedPassword(object passwordBoxObject)
@@ -87,8 +142,14 @@ namespace Application
 
         private void CreateNewFile()
         {
+            if (_fileModel != null)
+            {
+                var userDecision = MessageBox.Show("Are you sure you want to create a new file? This will override the current file.","Warning!",MessageBoxButton.YesNo);
+                if (userDecision != MessageBoxResult.Yes) return;
+            }
             _fileModel = new FileModel {Name = "New Note"};
             _viewModel.FileModel = _fileModel;
+            _viewModel.Locked = false;
         }
 
         private void Save()
@@ -119,6 +180,7 @@ namespace Application
                 password = _fileModel.Password.PlainText;
                 note.Encrypt(message, password);
                 Writer.SaveToFile(note, _fileModel.FilePath);
+                _fileModel.Saved = true;
             }
             catch (Exception e)
             {
@@ -183,7 +245,6 @@ namespace Application
         private void CreatePassword(Action onChange)
         {
             _passwordViewModel.CurrentPasswordVisible = _fileModel.Password.IsDefined;
-            _passwordViewModel.CurrentError = null;
             _passwordWindow = new (){DataContext = _passwordViewModel};
             _passwordWindow.Closing += (o, e) => onChange();
             _passwordWindow.ShowDialog();
@@ -193,8 +254,8 @@ namespace Application
             var dialog = new SaveFileDialog()
             {
                 AddExtension = true,
-                Filter = "Crypto Note File | *.cryptoNote",
-                DefaultExt = ".cryptoNote",
+                Filter = $"Crypto Note File | *{Constants.fileExtension}",
+                DefaultExt = Constants.fileExtension,
                 FileName = defaultFileName,
             };
             if (Directory.Exists(UserSettings.Default.SaveFolder))

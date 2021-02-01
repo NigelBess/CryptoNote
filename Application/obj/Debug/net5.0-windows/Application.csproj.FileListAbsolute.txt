@@ -51,3 +51,5 @@ C:\Dev\CryptoNote\Application\obj\Debug\net5.0-windows\Application.AssemblyInfo.
 C:\Dev\CryptoNote\Application\obj\Debug\net5.0-windows\Application.csproj.CoreCompileInputs.cache
 C:\Dev\CryptoNote\Application\obj\Debug\net5.0-windows\Application.csproj.CopyComplete
 C:\Dev\CryptoNote\Application\obj\Debug\net5.0-windows\Application.genruntimeconfig.cache
+C:\Dev\CryptoNote\Application\obj\Debug\net5.0-windows\ValidationControl.g.cs
+C:\Dev\CryptoNote\Application\obj\Debug\net5.0-windows\ValidationControl.baml
