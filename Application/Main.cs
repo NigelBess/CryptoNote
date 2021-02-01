@@ -12,14 +12,13 @@ namespace Application
         private readonly MainWindow _mainWindow = new ();
         private readonly MainWindowViewModel _viewModel = new ();
 
-        private readonly PasswordWindow _passwordWindow = new();
+        private PasswordWindow _passwordWindow;
         private readonly PasswordWindowViewModel _passwordViewModel = new();
 
         private FileModel _fileModel;
         public void Start()
         {
             _mainWindow.DataContext = _viewModel;
-            _passwordWindow.DataContext = _passwordViewModel;
 
             SetupViewModels();
             CreateNewFile();
@@ -41,7 +40,7 @@ namespace Application
             {
 
                 oldPassword = passwordBoxes[0].Password.ToBytes();
-                if (_fileModel.Password.IsDefined && !_fileModel.Password.Equals(oldPassword))
+                if (_fileModel.Password.IsDefined && !_fileModel.Password.Matches(oldPassword))
                 {
                     OnError("Incorrect Password!");
                     return;
@@ -99,7 +98,9 @@ namespace Application
         private void CreatePassword()
         {
             _passwordViewModel.CurrentPasswordVisible = _fileModel.Password.IsDefined;
-            _passwordWindow.Show();
+            _passwordViewModel.CurrentError = null;
+            _passwordWindow = new (){DataContext = _passwordViewModel};
+            _passwordWindow.ShowDialog();
         }
         private string Browse()
         {
@@ -112,7 +113,7 @@ namespace Application
         }
         private void OnError(Exception e)
         {
-
+            _passwordViewModel.CurrentError = e.Message;
         }
 
     }

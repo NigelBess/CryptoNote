@@ -47,6 +47,7 @@ namespace Application
         public bool IsDefined => Cipher != null;
 
 
-        public bool Equals(EncryptedString other) => ByteArrayFunctions.AreEqual(Cipher, other.Cipher);
+        public bool Matches(EncryptedString other) => ByteArrayFunctions.AreEqual(Cipher, other.Cipher);
+        public bool Matches(byte[] other) => ByteArrayFunctions.AreEqual(Cipher, Encrypt(other));
     }
 }
