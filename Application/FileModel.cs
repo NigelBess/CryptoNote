@@ -54,6 +54,7 @@ namespace Application
 
         public void SwapToTentativePassword()
         {
+            if (!TentativePassword.IsDefined) return;
             Password.Wipe();
             Password.TakeValue(TentativePassword);
             TentativePassword.Wipe();

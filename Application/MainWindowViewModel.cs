@@ -78,6 +78,7 @@ namespace Application
         public ICommand ChangePassword { get; set; }
 
         public ICommand Save { get; set; }
+        public ICommand SaveAs { get; set; }
 
         private void BindFileModel(FileModel model)
         {

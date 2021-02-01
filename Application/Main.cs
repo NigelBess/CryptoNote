@@ -36,6 +36,11 @@ namespace Application
             _viewModel.CreateNew = new Command(CreateNewFile);
             _viewModel.Lock = new Command(Lock, IsUnlocked);
             _viewModel.Save = new Command(Save, IsUnlocked);
+            _viewModel.SaveAs = new Command(()=>
+            {
+                _fileModel.FilePath = null;
+                Save();
+            }, IsUnlocked);
         }
 
         private bool IsLocked() => _fileModel == null;
@@ -60,13 +65,27 @@ namespace Application
             {
                 if (!_fileModel.Password.IsDefined)
                 {
-                    CreatePassword(()=>
+                    CreatePassword(() =>
                     {
+                        if (!_fileModel.TentativePassword.IsDefined) return;
                         _fileModel.SwapToTentativePassword();
                         Lock();
                     });
                     return;
                 }
+
+                if (!_fileModel.Saved)
+                {
+                    var userDecision = MessageBox.Show(
+                        "It highly is recommended to save before locking! \n You will not be able to save when the file is locked, and you may lose any unsaved data. Continue anyway?",
+                        "Warning!", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (userDecision != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+                }
+                
+                
 
                 if (!_fileModel.Text.IsDefined)
                 {
@@ -162,6 +181,7 @@ namespace Application
                 if (!_fileModel.Password.IsDefined) {
                     CreatePassword(() =>
                     {
+                        if (!_fileModel.TentativePassword.IsDefined) return;
                         _fileModel.SwapToTentativePassword();
                         Save();
                         
@@ -201,6 +221,7 @@ namespace Application
 
             try
             {
+                if (!_fileModel.TentativePassword.IsDefined) return;
                 CryptoNote currentFileContents = null;
                 //If the file has not been saved yet, just change the password locally without asking
                 if (string.IsNullOrWhiteSpace(_fileModel.FilePath) || !new Reader().TryRead(_fileModel.FilePath, out currentFileContents))
@@ -251,6 +272,7 @@ namespace Application
         }
         private string Browse(string defaultFileName, out string fileName)
         {
+            fileName = defaultFileName;
             var dialog = new SaveFileDialog()
             {
                 AddExtension = true,
@@ -260,7 +282,8 @@ namespace Application
             };
             if (Directory.Exists(UserSettings.Default.SaveFolder))
                 dialog.InitialDirectory = UserSettings.Default.SaveFolder;
-            var path =dialog.ShowDialog() == true ? dialog.FileName : null;
+            if (!dialog.ShowDialog()??false) return null;
+            var path = dialog.FileName;
             UserSettings.Default.SaveFolder = Path.GetDirectoryName(path);
             fileName = Path.GetFileNameWithoutExtension(path);
             UserSettings.Default.Save();
