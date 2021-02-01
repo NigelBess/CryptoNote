@@ -14,8 +14,8 @@ namespace TestCryptoNote
         {
             var note = new CryptoNote(defaultIterations);
             note.Encrypt(Message, Password);
-            Debug.WriteLine(TestFunctions.GetString(Message));
-            Debug.WriteLine(TestFunctions.GetString(note.Cipher));
+            Debug.WriteLine(Message.ToText());
+            Debug.WriteLine(note.Cipher.ToText());
             Assert.IsTrue(note.TryDecrypt(Password, out var decrypted));
             TestFunctions.AssertValueEquality(Message, decrypted);
         }

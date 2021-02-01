@@ -23,8 +23,8 @@ namespace Protocol
             using var encryptor = aes.CreateEncryptor(key, iv);
             var withValidity = PreProcess(toEncrypt);
             var outVar = encryptor.PerformCryptography(withValidity);
-            MemoryWiper.Wipe(withValidity);
-            MemoryWiper.Wipe(toEncrypt);
+            withValidity.Wipe();
+            toEncrypt.Wipe();
             return outVar;
         }
 

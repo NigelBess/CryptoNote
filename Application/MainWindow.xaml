@@ -20,7 +20,7 @@
                 <MenuItem Header="New"/>
             </MenuItem>
             <MenuItem Header="Security">
-                <MenuItem Header="Change Password"/>
+                <MenuItem Header="Change Password" Command="{Binding ChangePassword}"/>
                 <MenuItem Header="Lock"/>
             </MenuItem>
         </Menu>

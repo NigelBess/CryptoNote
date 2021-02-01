@@ -8,7 +8,6 @@ namespace TestCryptoNote
 {
     internal static class TestFunctions
     {
-        public static byte[] GetBytes(string message) => Encoding.ASCII.GetBytes(message);
         public static void AssertValueEquality(byte[] expected, byte[] actual)
         {
             Assert.AreEqual(expected.Length, actual.Length);
@@ -26,6 +25,5 @@ namespace TestCryptoNote
             }
         }
 
-        public static string GetString(byte[] message) => Encoding.UTF8.GetString(message);
     }
 }

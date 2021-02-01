@@ -29,7 +29,7 @@ namespace Protocol
                 {
                     decrypted = new byte[decryptionWithValidity.Length - Validity.ValidityCheckBytes.Length];
                     Array.Copy(decryptionWithValidity,Validity.ValidityCheckBytes.Length,decrypted,0,decrypted.Length);
-                    MemoryWiper.Wipe(decryptionWithValidity);
+                    decryptionWithValidity.Wipe();
                 }
                 return success;
 

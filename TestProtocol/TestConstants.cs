@@ -9,8 +9,8 @@ namespace TestCryptoNote
 {
     internal static class TestConstants
     {
-        public static byte[] Password => GetBytes("thisIsMyPassword!#");
-        public static byte[] Message => GetBytes("Welcome To CryptoNote!");
+        public static byte[] Password =>"thisIsMyPassword!#".ToBytes();
+        public static byte[] Message => "Welcome To CryptoNote!".ToBytes();
         public const int defaultIterations = 999;
 
     }

@@ -29,10 +29,25 @@ namespace Application
             }
         }
 
-        public Func<string> GetText { get; set; }
+
+        public readonly EncryptedString Text = new();
+
+        public readonly EncryptedString Password = new();
+        
 
         public string FilePath { get; set; }
 
         public CryptoNote CryptoNote { get; set; }
+
+        public FileModel()
+        {
+            Text.ContentsChanged += ContentsChanged;
+            Password.ContentsChanged += ContentsChanged;
+        }
+
+        private void ContentsChanged()
+        {
+            Saved = false;
+        }
     }
 }
