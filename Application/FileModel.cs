@@ -4,7 +4,7 @@ using Protocol;
 
 namespace Application
 {
-    class FileModel:Notifier
+    class FileModel : Notifier
     {
         private string _name;
         public string Name
@@ -33,11 +33,11 @@ namespace Application
         public readonly EncryptedString Text = new();
 
         public readonly EncryptedString Password = new();
-        
+        public readonly EncryptedString TentativePassword = new();
+
 
         public string FilePath { get; set; }
 
-        public CryptoNote CryptoNote { get; set; }
 
         public FileModel()
         {
@@ -48,6 +48,13 @@ namespace Application
         private void ContentsChanged()
         {
             Saved = false;
+        }
+
+        public void SwapToTentativePassword()
+        {
+            Password.Wipe();
+            Password.TakeValue(TentativePassword);
+            TentativePassword.Wipe();
         }
     }
 }

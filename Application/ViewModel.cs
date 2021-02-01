@@ -35,7 +35,7 @@ namespace Application
                 hashSet = new HashSet<PropertyChangedEventHandler>();
                 _modelBindings[model] = hashSet;
             }
-
+            model.PropertyChanged += binding;
             hashSet.Add(binding);
             OnChange(ownProperty);
         }

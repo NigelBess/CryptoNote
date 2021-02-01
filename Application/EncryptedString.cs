@@ -26,6 +26,11 @@ namespace Application
             }
         }
 
+        public void TakeValue(EncryptedString other)
+        {
+            Cipher = other.Cipher;
+        }
+
         public byte[] PlainText
         {
             get
@@ -42,6 +47,12 @@ namespace Application
             var cipher = Encryptor.Encrypt(value, _key, _iv);
             value.Wipe();
             return cipher;
+        }
+
+        public void Wipe()
+        {
+            Cipher?.Wipe();
+            Cipher = null;
         }
 
         public bool IsDefined => Cipher != null;

@@ -30,6 +30,8 @@ namespace Application
 
         public ICommand ChangePassword { get; set; }
 
+        public ICommand Save { get; set; }
+
         private void BindFileModel(FileModel model)
         {
             //Bind(model, nameof(FileModel.Text),nameof(Text));
