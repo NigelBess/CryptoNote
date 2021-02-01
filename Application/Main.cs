@@ -41,6 +41,36 @@ namespace Application
                 _fileModel.FilePath = null;
                 Save();
             }, IsUnlocked);
+            _viewModel.Open = new Command(Open);
+        }
+
+        private void Open()
+        {
+            if (_fileModel != null && !_fileModel.Saved)
+            {
+                var userDecision = MessageBox.Show("Are you sure you want to open a different file? You will lose any unsaved progress.", "Warning!", MessageBoxButton.YesNo);
+                if (userDecision != MessageBoxResult.Yes) return;
+            }
+
+            var dialog = new OpenFileDialog()
+            {
+                AddExtension = true,
+                Filter = $"Crypto Note File | *{Constants.fileExtension}",
+                DefaultExt = Constants.fileExtension,
+            };
+            if (Directory.Exists(UserSettings.Default.LoadFolder))
+                dialog.InitialDirectory = UserSettings.Default.SaveFolder;
+            if (!dialog.ShowDialog() ?? false) return;
+
+
+            if (!new Reader().TryRead(dialog.FileName, out var note))
+            {
+                OnError("Unable to open selected file!");
+                return;
+            }
+            _note = note;
+            WipeFileModel();
+            
         }
 
         private bool IsLocked() => _fileModel == null;
@@ -161,9 +191,9 @@ namespace Application
 
         private void CreateNewFile()
         {
-            if (_fileModel != null)
+            if (_fileModel != null && !_fileModel.Saved)
             {
-                var userDecision = MessageBox.Show("Are you sure you want to create a new file? This will override the current file.","Warning!",MessageBoxButton.YesNo);
+                var userDecision = MessageBox.Show("Are you sure you want to create a new file? You will lose any unsaved progress.","Warning!",MessageBoxButton.YesNo);
                 if (userDecision != MessageBoxResult.Yes) return;
             }
             _fileModel = new FileModel {Name = "New Note"};

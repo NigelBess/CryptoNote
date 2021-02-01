@@ -46,5 +46,17 @@ namespace Application {
                 this["Iterations"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LoadFolder {
+            get {
+                return ((string)(this["LoadFolder"]));
+            }
+            set {
+                this["LoadFolder"] = value;
+            }
+        }
     }
 }

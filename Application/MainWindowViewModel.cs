@@ -79,6 +79,7 @@ namespace Application
 
         public ICommand Save { get; set; }
         public ICommand SaveAs { get; set; }
+        public ICommand Open { get; set; }
 
         private void BindFileModel(FileModel model)
         {
