@@ -1,6 +1,6 @@
 ﻿
 using System;
-using CryptoNote;
+using Protocol;
 
 namespace Application
 {
@@ -33,6 +33,6 @@ namespace Application
 
         public string FilePath { get; set; }
 
-        public EncryptedNote EncryptedNote { get; set; }
+        public CryptoNote CryptoNote { get; set; }
     }
 }

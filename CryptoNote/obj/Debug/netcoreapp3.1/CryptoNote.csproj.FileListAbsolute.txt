@@ -1,9 +1,0 @@
-C:\Dev\SecretNotes\CryptoNote\bin\Debug\netcoreapp3.1\CryptoNote.deps.json
-C:\Dev\SecretNotes\CryptoNote\bin\Debug\netcoreapp3.1\CryptoNote.dll
-C:\Dev\SecretNotes\CryptoNote\bin\Debug\netcoreapp3.1\CryptoNote.pdb
-C:\Dev\SecretNotes\CryptoNote\obj\Debug\netcoreapp3.1\CryptoNote.csprojAssemblyReference.cache
-C:\Dev\SecretNotes\CryptoNote\obj\Debug\netcoreapp3.1\CryptoNote.AssemblyInfoInputs.cache
-C:\Dev\SecretNotes\CryptoNote\obj\Debug\netcoreapp3.1\CryptoNote.AssemblyInfo.cs
-C:\Dev\SecretNotes\CryptoNote\obj\Debug\netcoreapp3.1\CryptoNote.csproj.CoreCompileInputs.cache
-C:\Dev\SecretNotes\CryptoNote\obj\Debug\netcoreapp3.1\CryptoNote.dll
-C:\Dev\SecretNotes\CryptoNote\obj\Debug\netcoreapp3.1\CryptoNote.pdb

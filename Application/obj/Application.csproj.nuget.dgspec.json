@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Dev\\SecretNotes\\Application\\Application.csproj": {}
+    "C:\\Dev\\CryptoNote\\Application\\Application.csproj": {}
   },
   "projects": {
-    "C:\\Dev\\SecretNotes\\Application\\Application.csproj": {
+    "C:\\Dev\\CryptoNote\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\SecretNotes\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\Dev\\CryptoNote\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "C:\\Dev\\SecretNotes\\Application\\Application.csproj",
+        "projectPath": "C:\\Dev\\CryptoNote\\Application\\Application.csproj",
         "packagesPath": "C:\\Users\\nigel\\.nuget\\packages\\",
-        "outputPath": "C:\\Dev\\SecretNotes\\Application\\obj\\",
+        "outputPath": "C:\\Dev\\CryptoNote\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nigel\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "net5.0-windows7.0": {
             "targetAlias": "net5.0-windows",
             "projectReferences": {
-              "C:\\Dev\\SecretNotes\\CryptoNote\\CryptoNote.csproj": {
-                "projectPath": "C:\\Dev\\SecretNotes\\CryptoNote\\CryptoNote.csproj"
+              "C:\\Dev\\CryptoNote\\Protocol\\Protocol.csproj": {
+                "projectPath": "C:\\Dev\\CryptoNote\\Protocol\\Protocol.csproj"
               }
             }
           }
@@ -65,14 +65,14 @@
         }
       }
     },
-    "C:\\Dev\\SecretNotes\\CryptoNote\\CryptoNote.csproj": {
+    "C:\\Dev\\CryptoNote\\Protocol\\Protocol.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\SecretNotes\\CryptoNote\\CryptoNote.csproj",
-        "projectName": "CryptoNote",
-        "projectPath": "C:\\Dev\\SecretNotes\\CryptoNote\\CryptoNote.csproj",
+        "projectUniqueName": "C:\\Dev\\CryptoNote\\Protocol\\Protocol.csproj",
+        "projectName": "Protocol",
+        "projectPath": "C:\\Dev\\CryptoNote\\Protocol\\Protocol.csproj",
         "packagesPath": "C:\\Users\\nigel\\.nuget\\packages\\",
-        "outputPath": "C:\\Dev\\SecretNotes\\CryptoNote\\obj\\",
+        "outputPath": "C:\\Dev\\CryptoNote\\Protocol\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nigel\\AppData\\Roaming\\NuGet\\NuGet.Config",

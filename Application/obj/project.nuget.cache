@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bmzcBH3i51ngAbux+zdbG6MX4V85kFoXtmgzcQ4iLCAMHUbwcESJw90fOh66nwQm9jPVX45ioVqTjmRXFGn+sw==",
+  "dgSpecHash": "NiM/pTFvORaTsGur+Qzqrkodb9rZg41psdHYFLjkw2x7+n7kXd3A2LIOrYEEMiLveWtwUCMIlXBSNJv8OzxCZg==",
   "success": true,
-  "projectFilePath": "C:\\Dev\\SecretNotes\\Application\\Application.csproj",
+  "projectFilePath": "C:\\Dev\\CryptoNote\\Application\\Application.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

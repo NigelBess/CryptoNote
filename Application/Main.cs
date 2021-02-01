@@ -1,6 +1,6 @@
 ﻿
 
-using CryptoNote;
+using Protocol;
 using Microsoft.Win32;
 
 namespace Application
@@ -27,10 +27,7 @@ namespace Application
         {
             model.FilePath ??= Browse();
             if (model.FilePath == null) return;
-            if (model.EncryptedNote?.KeyInfo?.key == null)
-            {
-                model.EncryptedNote.GenerateEmptyKeyInfo();
-            }
+
 
         }
 
