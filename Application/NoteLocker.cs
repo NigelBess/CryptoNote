@@ -54,7 +54,6 @@ namespace Application
             CryptoNote note = null;
             SafeExecute(() =>
             {
-                var state = GetState();
                 if (IsLocked)
                 {
                     note = _encryptedData;
@@ -86,7 +85,6 @@ namespace Application
             byte[] password = null;
             SafeExecute(() =>
             {
-                var state = GetState();
                 if (IsLocked)
                 {
                     OnError("This note is already Locked!");
@@ -132,24 +130,27 @@ namespace Application
             byte[] message = null;
             SafeExecute(() =>
             {
-                var state = GetState();
-                if (state == State.Unlocked)
+                if (IsUnlocked)
                 {
                     OnError("This note is already unlocked!");
                     return;
                 }
 
-                if (state == State.Empty)
+                if (IsEmpty)
                 {
                     OnError("There is no data to unlock!");
                     return;
                 }
 
-                if (state != State.Locked)
+                if (!IsLocked)
                 {
                     OnError("Unknown instruction for this lock state. Please alert a developer.");
                 }
-                if (!_encryptedData.TryDecrypt(password, out message)) OnError("Incorrect Password!");
+
+                if (!_encryptedData.TryDecrypt(password, out message))
+                {
+                    return;
+                }
                 _vulnerableData.Message.SetPlainText(message);
                 _vulnerableData.Password.SetPlainText(password);
             },password, message);

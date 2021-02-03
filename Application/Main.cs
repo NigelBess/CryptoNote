@@ -64,8 +64,12 @@ namespace Application
 
         private void Unlock(object passwordBoxObj)
         {
+            var saved = _saveData.Saved;
             var passwordBox = (PasswordBox) passwordBoxObj;
-            _note.UnLock(passwordBox.Password.ToBytes());
+            var passwordText = passwordBox.Password.ToBytes();
+            passwordBox.Password = string.Empty;
+            _note.UnLock(passwordText);
+            _saveData.Saved = saved;
         }
 
         private void Open()
@@ -93,9 +97,13 @@ namespace Application
                 return;
             }
 
-            note.OnError = OnError;
+            
 
+            note.OnError = OnError;
             _note.Load(note);
+            _saveData.FilePath = dialog.FileName;
+            _saveData.Saved = true;
+            
 
         }
 
@@ -105,11 +113,13 @@ namespace Application
 
         private void Lock()
         {
+            var saved = _saveData.Saved;
             if (!_note.IsPasswordSet)
             {
                 if (!TryChangePassword()) return;
             }
             _note.Lock();
+            _saveData.Saved = saved;
         }
 
         private void UserConfirmedPassword(object passwordBoxObject)
@@ -163,7 +173,9 @@ namespace Application
                 if (userDecision != MessageBoxResult.Yes) return;
             }
             _note.Reset();
+            _saveData.FilePath = null;
             _saveData.Saved = true;
+
         }
 
         private void Save()
@@ -180,9 +192,28 @@ namespace Application
             }
 
             var note = _note.GenerateEncryptedOutput();
-            Writer.SaveToFile(note, _saveData.FilePath);
+            var path = _saveData.FilePath;
+            Writer.SaveToFile(note, path);
+            if (!VerifySuccessfulSave(note, path))
+            {
+                OnError("Note did not save successfully!");
+                File.Delete(path);
+                return;
+            }
             _saveData.Saved = true;
         }
+
+        private bool VerifySuccessfulSave(CryptoNote note, string path)
+        {
+            var ableToRead = new Reader().TryRead(path, out var loadedNote);
+            if (!ableToRead) return false;
+            if (!ByteArrayFunctions.AreEqual(note.Cipher, loadedNote.Cipher)) return false;
+            if (!ByteArrayFunctions.AreEqual(note.Salt, loadedNote.Salt)) return false;
+            if (!ByteArrayFunctions.AreEqual(note.InitializationVector, loadedNote.InitializationVector)) return false;
+            if (note.Iterations != loadedNote.Iterations) return false;
+            return true;
+        }
+
 
         private bool TryChangePassword()
         {

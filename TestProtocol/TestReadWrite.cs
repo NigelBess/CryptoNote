@@ -21,7 +21,8 @@ namespace TestCryptoNote
             AssertValueEquality(note.Salt,loadedNote.Salt);
             Assert.AreEqual(note.Iterations, loadedNote.Iterations);
             AssertValueEquality(note.InitializationVector,loadedNote.InitializationVector);
-            Assert.IsTrue(note.TryDecrypt(Password, out var loadedMessage));
+            AssertValueEquality(note.Cipher, loadedNote.Cipher);
+            Assert.IsTrue(loadedNote.TryDecrypt(Password, out var loadedMessage));
             AssertValueEquality(Message, loadedMessage);
         }
 

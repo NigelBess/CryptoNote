@@ -19,7 +19,7 @@ namespace Protocol
             note.Salt = ReadBytes(fileStream, 32);
             note.Iterations = BitConverter.ToInt32(ReadBytes(fileStream,4));
             note.InitializationVector = ReadBytes(fileStream, 16);
-            note.Cipher = ReadBytes(fileStream, (int)(fileSize - index + 1));
+            note.Cipher = ReadBytes(fileStream, (int)(fileSize - index));
             return true;
         }
 
