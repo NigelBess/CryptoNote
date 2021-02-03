@@ -1,4 +1,5 @@
-﻿using static Protocol.RandomGenerator;
+﻿using System;
+using static Protocol.RandomGenerator;
 
 namespace Protocol
 {
@@ -8,7 +9,7 @@ namespace Protocol
         /// The 16 byte initialization vector for AES encryption/decryption
         /// </summary>
         public byte[] InitializationVector;
-
+        public Action<Exception> OnError;
         /// <summary>
         /// The salt used for generating the AES key from the password
         /// </summary>
@@ -39,9 +40,15 @@ namespace Protocol
 
         public bool TryDecrypt(byte[] password, out byte[] message)
         {
-            return Decryptor.TryDecrypt(Cipher, DeriveKey(password), InitializationVector, out message);
+            var success = Decryptor.TryDecrypt(Cipher, DeriveKey(password), InitializationVector, out message, out var exception);
+            if (!success) OnError?.Invoke(exception);
+            return success;
         }
 
 
+        public void Wipe()
+        {
+            Cipher?.Wipe();
+        }
     }
 }

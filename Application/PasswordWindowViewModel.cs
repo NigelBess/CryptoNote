@@ -26,7 +26,7 @@ namespace Application
 
         public Visibility CurrentPasswordVisibility => CurrentPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
 
-        public ICommand ChangePassword { get; set; }
+        public ICommand ConfirmPassword { get; set; }
 
     }
 }

@@ -8,5 +8,7 @@ namespace Protocol
     {
         public const ushort ProtocolVersion = 1;
         public const string fileExtension = ".cryptonote";
+        public const int KeyLength = 32;
+        public const int IvLength = 16;
     }
 }

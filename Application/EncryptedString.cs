@@ -3,17 +3,14 @@ using Protocol;
 
 namespace Application
 {
-    class EncryptedString
+    class EncryptedString:HandlesExceptions
     {
-        private readonly byte[] _key = RandomGenerator.GenerateBytes(32);
-        private readonly byte[] _iv = RandomGenerator.GenerateBytes(16);
+        private byte[] _key = new byte[Constants.KeyLength];
+        private byte[] _iv = new byte[Constants.IvLength];
         public Action ContentsChanged;
 
-        public EncryptedString()
-        {
-        }
+        public EncryptedString() => Wipe();
 
-        public EncryptedString(byte[] plainText) => PlainText = plainText;
         private byte[] _cipher;
 
         public byte[] Cipher
@@ -26,39 +23,41 @@ namespace Application
             }
         }
 
-        public void TakeValue(EncryptedString other)
+        public void SetPlainText(byte[] text)
         {
-            PlainText = other.PlainText;
+            Wipe();
+            Cipher = text==null?null: Encrypt(text);
         }
 
-        public byte[] PlainText
+        public byte[] GetPlainText()
         {
-            get
-            {
-                if (Cipher == null) return null;
-                if (Decryptor.TryDecrypt(Cipher, _key, _iv, out var plainText)) return plainText;
-                throw new Exception("Decryption of stored string failed!");
-            }
-            set => Cipher = value == null ? null : Encrypt(value);
+            if (Cipher == null) return null;
+            if (Decryptor.TryDecrypt(Cipher, _key, _iv, out var plainText, out var exception)) return plainText;
+            OnError(exception);
+            return null;
         }
+
 
         private byte[] Encrypt(byte[] value)
         {
-            var cipher = Encryptor.Encrypt(value, _key, _iv);
-            value.Wipe();
+            byte[] cipher = null;
+            SafeExecute(() =>
+            {
+                cipher = Encryptor.Encrypt(value, _key, _iv);
+            }, value);
             return cipher;
         }
 
         public void Wipe()
         {
             Cipher?.Wipe();
+            _key.TakeValues(RandomGenerator.GenerateBytes(Constants.KeyLength));
+            _iv.TakeValues(RandomGenerator.GenerateBytes(Constants.IvLength));
             Cipher = null;
         }
 
         public bool IsDefined => Cipher != null;
 
-
-        public bool Matches(EncryptedString other) => ByteArrayFunctions.AreEqual(Cipher, other.Cipher);
-        public bool Matches(byte[] other) => ByteArrayFunctions.AreEqual(Cipher, Encrypt(other));
+        public bool Matches(byte[] plainText) => ByteArrayFunctions.AreEqual(Cipher, Encrypt(plainText));
     }
 }

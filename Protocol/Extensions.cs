@@ -25,8 +25,8 @@ namespace Protocol
             }
         }
 
-        public static string ToText(this byte[] value) => value==null?null:Encoding.UTF8.GetString(value);
-        public static byte[] ToBytes(this string value) => value == null ? null : Encoding.UTF8.GetBytes(value);
+        public static string ToText(this byte[] value) => value==null?null:Encoding.ASCII.GetString(value);
+        public static byte[] ToBytes(this string value) => value == null ? null : Encoding.ASCII.GetBytes(value);
 
     }
 }

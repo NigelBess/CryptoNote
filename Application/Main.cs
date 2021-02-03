@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,44 +7,70 @@ using Microsoft.Win32;
 
 namespace Application
 {
-    class Main
+    class Main:HandlesExceptions
     {
         private readonly MainWindow _mainWindow = new ();
-        private readonly MainWindowViewModel _viewModel = new ();
 
         private PasswordWindow _passwordWindow;
         private readonly PasswordWindowViewModel _passwordViewModel = new();
 
-        private FileModel _fileModel;
-        private CryptoNote _note;
+        private readonly SaveData _saveData = new();
+        private readonly NoteLocker _note;
+
+        public Main()
+        {
+            var password = new EncryptedString() {ErrorCaught = HandleError};
+            var message = new EncryptedString() { ErrorCaught = HandleError };
+            var vulnerableData = new VulnerableData(message,password) ;
+            _note = new NoteLocker(vulnerableData) { ErrorCaught = HandleError };
+            var mainWindowViewModel = new MainWindowViewModel(message) {SaveData = _saveData};
+
+            message.ContentsChanged += ()=>_saveData.Saved = false;
+            password.ContentsChanged += () =>_saveData.Saved = false;
+
+            _mainWindow.DataContext = mainWindowViewModel;
+
+            SetupPasswordViewModelCommands();
+            SetupMainViewModelCommands(mainWindowViewModel);
+        }
+
 
         public void Start()
         {
-            _mainWindow.DataContext = _viewModel;
-
-            SetupViewModels();
             CreateNewFile();
             _mainWindow.Show();
         }
 
-        public void SetupViewModels()
+
+        private void SetupPasswordViewModelCommands()
         {
-            _passwordViewModel.ChangePassword = new Command(UserConfirmedPassword, UserCanConfirmPassword);
-            _viewModel.ChangePassword = new Command(()=>CreatePassword(ChangePasswordOfExistingFile), IsUnlocked);
-            _viewModel.CreateNew = new Command(CreateNewFile);
-            _viewModel.Lock = new Command(Lock, IsUnlocked);
-            _viewModel.Save = new Command(Save, IsUnlocked);
-            _viewModel.SaveAs = new Command(()=>
+            _passwordViewModel.ConfirmPassword = new Command(UserConfirmedPassword, UserCanConfirmPassword);
+        }
+
+        private void SetupMainViewModelCommands(MainWindowViewModel viewModel)
+        {
+            viewModel.ChangePassword = new Command(()=>TryChangePassword(), IsUnlocked);
+            viewModel.CreateNew = new Command(CreateNewFile);
+            viewModel.Lock = new Command(Lock, IsUnlocked);
+            viewModel.Save = new Command(Save, IsUnlocked);
+            viewModel.SaveAs = new Command(() =>
             {
-                _fileModel.FilePath = null;
+                _saveData.FilePath = null;
                 Save();
             }, IsUnlocked);
-            _viewModel.Open = new Command(Open);
+            viewModel.Open = new Command(Open);
+            viewModel.Unlock = new Command(Unlock, o => IsLocked());
+        }
+
+        private void Unlock(object passwordBoxObj)
+        {
+            var passwordBox = (PasswordBox) passwordBoxObj;
+            _note.UnLock(passwordBox.Password.ToBytes());
         }
 
         private void Open()
         {
-            if (_fileModel != null && !_fileModel.Saved)
+            if (_saveData != null && !_saveData.Saved)
             {
                 var userDecision = MessageBox.Show("Are you sure you want to open a different file? You will lose any unsaved progress.", "Warning!", MessageBoxButton.YesNo);
                 if (userDecision != MessageBoxResult.Yes) return;
@@ -68,75 +92,24 @@ namespace Application
                 OnError("Unable to open selected file!");
                 return;
             }
-            _note = note;
-            WipeFileModel();
-            
+
+            note.OnError = OnError;
+
+            _note.Load(note);
+
         }
 
-        private bool IsLocked() => _fileModel == null;
+        private bool IsLocked() => _note.IsLocked;
         private bool IsUnlocked() => !IsLocked();
 
-        private void WipeFileModel()
-        {
-            _fileModel.Password.Wipe();
-            _fileModel.Text.Wipe();
-            _viewModel.FileModel = null;
-            _fileModel = null;
-            _viewModel.Text = null;
-            _viewModel.Locked = true;
-        }
 
         private void Lock()
         {
-            
-            byte[] message = null;
-            byte[] password = null;
-            try
+            if (!_note.IsPasswordSet)
             {
-                if (!_fileModel.Password.IsDefined)
-                {
-                    CreatePassword(() =>
-                    {
-                        if (!_fileModel.TentativePassword.IsDefined) return;
-                        _fileModel.SwapToTentativePassword();
-                        Lock();
-                    });
-                    return;
-                }
-
-                if (!_fileModel.Saved)
-                {
-                    var userDecision = MessageBox.Show(
-                        "It highly is recommended to save before locking! \n You will not be able to save when the file is locked, and you may lose any unsaved data. Continue anyway?",
-                        "Warning!", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                    if (userDecision != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-                }
-                
-                
-
-                if (!_fileModel.Text.IsDefined)
-                {
-                    OnError("There is no text to encrypt!");
-                    return;
-                }
-                message = _fileModel.Text.PlainText;
-                password = _fileModel.Password.PlainText;
-                _note = new CryptoNote(UserSettings.Default.Iterations);
-                _note.Encrypt(message, password);
-                WipeFileModel();
+                if (!TryChangePassword()) return;
             }
-            catch (Exception e)
-            {
-                OnError(e);
-            }
-            finally
-            {
-                message?.Wipe();
-                password?.Wipe();
-            }
+            _note.Lock();
         }
 
         private void UserConfirmedPassword(object passwordBoxObject)
@@ -144,28 +117,21 @@ namespace Application
             var passwordBoxes = GetPasswordBoxes(passwordBoxObject);
             byte[] oldPassword = null;
             byte[] newPassword = null;
-            try
+            SafeExecute(() =>
             {
-
-                oldPassword = passwordBoxes[0].Password.ToBytes();
-                if (_fileModel.Password.IsDefined && !_fileModel.Password.Matches(oldPassword))
+                
+                if (_note.IsPasswordSet)
                 {
-                    OnError("Incorrect Password!");
-                    return;
+                    oldPassword = passwordBoxes[0].Password.ToBytes();
+                    if (!_note.DoesPasswordMatch(oldPassword))
+                    {
+                        OnError("Incorrect Password!");
+                        return;
+                    }
                 }
                 newPassword = passwordBoxes[1].Password.ToBytes();
-                _fileModel.TentativePassword.PlainText = newPassword;
-            }
-            catch (Exception e)
-            {
-                OnError(e);
-            }
-            finally
-            {
-                oldPassword?.Wipe();
-                newPassword?.Wipe();
-            }
-
+                _note.SetPassword(newPassword);
+            },oldPassword,newPassword);
             _passwordWindow.Close();
         }
 
@@ -191,118 +157,63 @@ namespace Application
 
         private void CreateNewFile()
         {
-            if (_fileModel != null && !_fileModel.Saved)
+            if (_saveData != null && !_saveData.Saved)
             {
                 var userDecision = MessageBox.Show("Are you sure you want to create a new file? You will lose any unsaved progress.","Warning!",MessageBoxButton.YesNo);
                 if (userDecision != MessageBoxResult.Yes) return;
             }
-            _fileModel = new FileModel {Name = "New Note"};
-            _viewModel.FileModel = _fileModel;
-            _viewModel.Locked = false;
+            _note.Reset();
+            _saveData.Saved = true;
         }
 
         private void Save()
         {
-            byte[] message = null;
-            byte[] password = null;
-
-            try
+            if (!_note.IsPasswordSet)
             {
-                if (!_fileModel.Password.IsDefined) {
-                    CreatePassword(() =>
-                    {
-                        if (!_fileModel.TentativePassword.IsDefined) return;
-                        _fileModel.SwapToTentativePassword();
-                        Save();
-                        
-                    });
-                    return;
-                }
-                if (_fileModel.FilePath == null)
-                {
-                    _fileModel.FilePath = Browse(_fileModel.Name, out var fileName);
-                    _fileModel.Name = fileName;
-                }
-
-                if (_fileModel.FilePath == null) return;
-                var note = new CryptoNote(UserSettings.Default.Iterations);
-                message = _fileModel.Text.PlainText;
-                password = _fileModel.Password.PlainText;
-                note.Encrypt(message, password);
-                Writer.SaveToFile(note, _fileModel.FilePath);
-                _fileModel.Saved = true;
-            }
-            catch (Exception e)
-            {
-                OnError(e);
-            }
-            finally
-            {
-                message?.Wipe();
-                password?.Wipe();
+                if (!TryChangePassword()) return;
             }
 
+            if (_saveData.FilePath == null)
+            {
+                _saveData.FilePath = Browse(_saveData.Name);
+                if (_saveData.FilePath == null) return;
+            }
+
+            var note = _note.GenerateEncryptedOutput();
+            Writer.SaveToFile(note, _saveData.FilePath);
+            _saveData.Saved = true;
         }
 
-        private void ChangePasswordOfExistingFile()
+        private bool TryChangePassword()
         {
-            byte[] message = null;
-            byte[] password = null;
-
-            try
+            byte[] oldCipher = null;
+            byte[] newCipher = null;
+            bool success = false;
+            SafeExecute(() =>
             {
-                if (!_fileModel.TentativePassword.IsDefined) return;
-                CryptoNote currentFileContents = null;
-                //If the file has not been saved yet, just change the password locally without asking
-                if (string.IsNullOrWhiteSpace(_fileModel.FilePath) || !new Reader().TryRead(_fileModel.FilePath, out currentFileContents))
+                Func<bool> didPasswordChange;
+                
+                if (!_note.IsPasswordSet)
                 {
-                    _fileModel.SwapToTentativePassword();
-                    return;
+                    didPasswordChange = () => _note.IsPasswordSet;
+                }
+                else
+                {
+                    oldCipher = _note.GetCopyOfPasswordCiper();
+                    didPasswordChange = () => ByteArrayFunctions.AreEqual(oldCipher, _note.GetCopyOfPasswordCiper());
                 }
 
-                //if the file exists, change the password on that file and locally
-                var userDecision =
-                    MessageBox.Show("Are you sure you want to change the password? This can not be undone.", "Warning!",
-                        MessageBoxButton.YesNo);
-                if (userDecision != MessageBoxResult.Yes) return;
-
-                password = _fileModel.Password.PlainText;
-                if (!currentFileContents.TryDecrypt(_fileModel.Password.PlainText, out message))
-                {
-                    OnError("File decryption failed!");
-                    return;
-                }
-
-                _fileModel.SwapToTentativePassword();
-
-                currentFileContents.Encrypt(message, _fileModel.Password.PlainText);
-                Writer.SaveToFile(currentFileContents, _fileModel.FilePath);
-            }
-            catch (Exception e)
-            {
-                OnError(e);
-            }
-            finally
-            {
-                message?.Wipe();
-                password?.Wipe();
-            }
-
-
-
-
+                _passwordViewModel.CurrentPasswordVisible = _note.IsPasswordSet;
+                _passwordWindow = new() { DataContext = _passwordViewModel };
+                _passwordWindow.ShowDialog();
+                success = didPasswordChange();
+            }, oldCipher,newCipher);
+            return success;
+            
         }
 
-        private void CreatePassword(Action onChange)
+        private string Browse(string defaultFileName)
         {
-            _passwordViewModel.CurrentPasswordVisible = _fileModel.Password.IsDefined;
-            _passwordWindow = new (){DataContext = _passwordViewModel};
-            _passwordWindow.Closing += (o, e) => onChange();
-            _passwordWindow.ShowDialog();
-        }
-        private string Browse(string defaultFileName, out string fileName)
-        {
-            fileName = defaultFileName;
             var dialog = new SaveFileDialog()
             {
                 AddExtension = true,
@@ -315,15 +226,10 @@ namespace Application
             if (!dialog.ShowDialog()??false) return null;
             var path = dialog.FileName;
             UserSettings.Default.SaveFolder = Path.GetDirectoryName(path);
-            fileName = Path.GetFileNameWithoutExtension(path);
             UserSettings.Default.Save();
             return path;
         }
-        private void OnError(string message)
-        {
-            OnError(new Exception(message));
-        }
-        private void OnError(Exception e)
+        public void HandleError(Exception e)
         {
             MessageBox.Show(e.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }

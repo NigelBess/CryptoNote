@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application
 {
@@ -37,6 +33,12 @@ namespace Application
                 if (bstr2 != IntPtr.Zero) Marshal.ZeroFreeBSTR(bstr2);
                 if (bstr1 != IntPtr.Zero) Marshal.ZeroFreeBSTR(bstr1);
             }
+        }
+
+        public static void TakeValues(this byte[] taker, byte[] giver)
+        {
+            if (taker.Length != giver.Length) throw new Exception("Byte arrays must be the same size");
+            Array.Copy(giver, taker, giver.Length);
         }
     }
 }

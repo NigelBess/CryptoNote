@@ -16,9 +16,10 @@ namespace Protocol
         /// <param name="iv">aes 256 IV (16 bytes)</param>
         /// <param name="decrypted">decrypted message or null if decryption failed</param>
         /// <returns>true if decryption is successful</returns>
-        public static bool TryDecrypt(byte[] encrypted, byte[] key, byte[] iv, out byte[] decrypted)
+        public static bool TryDecrypt(byte[] encrypted, byte[] key, byte[] iv, out byte[] decrypted, out Exception exception)
         {
             decrypted = null;
+            exception = null;
             using var aes = new AesManaged();
             using var decryptor = aes.CreateDecryptor(key, iv);
             try
@@ -34,8 +35,9 @@ namespace Protocol
                 return success;
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                exception = e;
                 return false;
             }
             

@@ -7,17 +7,28 @@ namespace Application
 {
     class MainWindowViewModel : ViewModel
     {
+        private readonly EncryptedString _messageModel;
 
-
-        public string Text
+        public MainWindowViewModel(EncryptedString message)
         {
-            get => _fileModel?.Text.PlainText.ToText();
-            set
-            {
-                if (_fileModel?.Text == null) return;
-                _fileModel.Text.PlainText = value.ToBytes();
-            }
+            _messageModel = message;
+            message.ContentsChanged += MessageContentsChanged;
         }
+
+        private void MessageContentsChanged()
+        {
+
+            Locked = !_messageModel.IsDefined;
+            OnChange(nameof(Message));
+        }
+
+
+        public string Message 
+        {
+            get => _messageModel.GetPlainText().ToText();
+            set => _messageModel.SetPlainText(value.ToBytes());
+        }
+
         private Visibility _validationVisibility;
 
         public Visibility ValidationVisibility
@@ -62,15 +73,15 @@ namespace Application
 
         public ICommand Lock { get; set; }
 
-        private FileModel _fileModel;
+        private SaveData _saveData;
 
-        public FileModel FileModel
+        public SaveData SaveData
         {
-            get => _fileModel;
+            get => _saveData;
             set
             {
-                if (_fileModel != null) Unbind(_fileModel);
-                _fileModel = value;
+                if (_saveData != null) Unbind(_saveData);
+                _saveData = value;
                 BindFileModel(value);
             }
         }
@@ -80,15 +91,19 @@ namespace Application
         public ICommand Save { get; set; }
         public ICommand SaveAs { get; set; }
         public ICommand Open { get; set; }
+        public ICommand Unlock { get; set; }
 
-        private void BindFileModel(FileModel model)
+        private void BindFileModel(SaveData model)
         {
             if (model == null) return;
-            Bind(model, nameof(FileModel.Text),nameof(Text));
-            Bind(model, nameof(FileModel.Name), nameof(FileName));
-            Bind(model, nameof(FileModel.Saved), nameof(FileName));
+            Bind(model, nameof(SaveData.Name), nameof(FileName));
+            Bind(model, nameof(SaveData.Saved), nameof(FileName));
         }
 
-        public string FileName => _fileModel==null?string.Empty:_fileModel.Name+(_fileModel.Saved?string.Empty:" *");
+        public string FileName => _saveData==null?string.Empty:_saveData.Name+(_saveData.Saved?string.Empty:" *");
+
+        
+
+
     }
 }

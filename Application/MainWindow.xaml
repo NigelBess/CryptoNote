@@ -31,7 +31,7 @@
             <TabControl Visibility="{Binding TextVisibility}">
                 <TabItem Header="{Binding FileName}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                        <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" ></TextBox>
+                        <TextBox Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" ></TextBox>
                     </ScrollViewer>
                 </TabItem>
             </TabControl>
