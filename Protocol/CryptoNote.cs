@@ -18,10 +18,17 @@ namespace Protocol
         /// The salt used for generating the AES key from the password
         /// </summary>
         public byte[] Salt;
-
+        /// <summary>
+        /// Number of iterations for PBKDF2 password generation
+        /// </summary>
         public int Iterations = 1028;
+        /// <summary>
+        /// Encrypted message with validity check
+        /// </summary>
         public byte[] Cipher { get; set; }
-
+        /// <summary>
+        /// Bytes used to verify that the cipher has been decrypted properly
+        /// </summary>
         public byte[] ValidityCheck { get; set; }
 
         public CryptoNote(int iterations)
@@ -30,7 +37,9 @@ namespace Protocol
             GenerateEntropy();
         }
 
-
+        /// <summary>
+        /// Resets all randomly generated parameters
+        /// </summary>
         public void GenerateEntropy()
         {
             InitializationVector = GenerateBytes(Constants.IvLength);
@@ -38,8 +47,18 @@ namespace Protocol
             ValidityCheck = GenerateBytes(Constants.ValidityLength);
         }
 
+        /// <summary>
+        /// Returns the AES key from a plaintext password
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
         private byte[] DeriveKey(byte[] password)=> Encryptor.DeriveKey(password, Salt, Iterations);
 
+        /// <summary>
+        /// Encrypts message using password and stores the result as the cypher
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="password"></param>
         public void Encrypt(byte[] message, byte[] password)
         {
             var validated = PreProcess(message, ValidityCheck);
@@ -63,6 +82,12 @@ namespace Protocol
             return outVar;
         }
 
+        /// <summary>
+        /// Attempts to read Cipher using given password
+        /// </summary>
+        /// <param name="password">password used for decryption</param>
+        /// <param name="message">plaintext message if successful</param>
+        /// <returns></returns>
         public bool TryDecrypt(byte[] password, out byte[] message)
         {
             var success = Decryptor.TryDecrypt(Cipher, DeriveKey(password), InitializationVector, ValidityCheck, out message, out var exception);
@@ -70,7 +95,9 @@ namespace Protocol
             return success;
         }
 
-
+        /// <summary>
+        /// Destroys data in the cipher
+        /// </summary>
         public void Wipe()
         {
             Cipher?.Wipe();

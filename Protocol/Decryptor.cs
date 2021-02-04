@@ -43,8 +43,13 @@ namespace Protocol
             }
             
         }
-
-        public static bool IsDecryptionValid(byte[] decrypted, byte[] validityCheck)
+        /// <summary>
+        /// Checks if decryption was valid
+        /// </summary>
+        /// <param name="decrypted">decrypted message</param>
+        /// <param name="validityCheck">validity check</param>
+        /// <returns></returns>
+        private static bool IsDecryptionValid(byte[] decrypted, byte[] validityCheck)
         {
             if (decrypted.Length < validityCheck.Length) return false;
             return !validityCheck.Where((t, i) => decrypted[i] != t).Any();

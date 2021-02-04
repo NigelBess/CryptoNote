@@ -3,6 +3,9 @@ using System.IO;
 
 namespace Protocol
 {
+    /// <summary>
+    /// handles creation of cryptonote files
+    /// </summary>
     public static class Writer
     {
         /// <summary>
@@ -32,17 +35,20 @@ namespace Protocol
             fileStream.Close();
         }
 
-
-        private static int WriteToFile(FileStream fs, object item)
+        /// <summary>
+        /// writes contents of item to file
+        /// </summary>
+        /// <param name="fs">file stream to write to</param>
+        /// <param name="item">should be a value type</param>
+        private static void WriteToFile(FileStream fs, object item)
         {
             if (!(item is byte[] bytes))
             {
                 var conversionFunction = typeof(BitConverter).GetMethod(nameof(BitConverter.GetBytes), new[] {item.GetType() });
-                bytes = (byte[]) conversionFunction.Invoke(null, new object[] {item});
+                bytes = (byte[]) conversionFunction.Invoke(null, new [] {item});
             }
 
             fs.Write(bytes, 0, bytes.Length);
-            return bytes.Length;
         }
 
     }
