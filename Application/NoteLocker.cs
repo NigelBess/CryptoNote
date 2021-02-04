@@ -8,7 +8,7 @@ namespace Application
         public byte[] Message => _vulnerableData.Password.GetPlainText();
         private readonly VulnerableData _vulnerableData;
         private CryptoNote _encryptedData;
-        public bool IsPasswordSet => _vulnerableData.Password.IsDefined;
+        public bool IsPasswordSet => IsLocked || _vulnerableData.Password.IsDefined;
         public bool IsLocked => GetState() == State.Locked;
         public bool IsEmpty => GetState() == State.Empty;
         public bool IsUnlocked => GetState() == State.Unlocked;
@@ -149,6 +149,7 @@ namespace Application
 
                 if (!_encryptedData.TryDecrypt(password, out message))
                 {
+                    OnError("Invalid password or corrupt file!");
                     return;
                 }
                 _vulnerableData.Message.SetPlainText(message);
@@ -166,5 +167,10 @@ namespace Application
         public bool DoesPasswordMatch(byte[] oldPassword) => _vulnerableData.Password.Matches(oldPassword);
 
         public void SetPassword(byte[] newPassword) => _vulnerableData.Password.SetPlainText(newPassword);
+
+        public void Wipe()
+        {
+            _vulnerableData.Wipe();
+        }
     }
 }

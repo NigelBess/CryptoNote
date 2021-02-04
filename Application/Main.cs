@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,10 +30,12 @@ namespace Application
             password.ContentsChanged += () =>_saveData.Saved = false;
 
             _mainWindow.DataContext = mainWindowViewModel;
+            _mainWindow.Closing += OnWindowClose;
 
             SetupPasswordViewModelCommands();
             SetupMainViewModelCommands(mainWindowViewModel);
         }
+
 
 
         public void Start()
@@ -52,12 +55,12 @@ namespace Application
             viewModel.ChangePassword = new Command(()=>TryChangePassword(), IsUnlocked);
             viewModel.CreateNew = new Command(CreateNewFile);
             viewModel.Lock = new Command(Lock, IsUnlocked);
-            viewModel.Save = new Command(Save, IsUnlocked);
+            viewModel.Save = new Command(Save);
             viewModel.SaveAs = new Command(() =>
             {
                 _saveData.FilePath = null;
                 Save();
-            }, IsUnlocked);
+            });
             viewModel.Open = new Command(Open);
             viewModel.Unlock = new Command(Unlock, o => IsLocked());
         }
@@ -165,6 +168,7 @@ namespace Application
             return passwordBoxArray;
         }
 
+
         private void CreateNewFile()
         {
             if (_saveData != null && !_saveData.Saved)
@@ -193,6 +197,7 @@ namespace Application
 
             var note = _note.GenerateEncryptedOutput();
             var path = _saveData.FilePath;
+            if (File.Exists(path)) File.Delete(path);
             Writer.SaveToFile(note, path);
             if (!VerifySuccessfulSave(note, path))
             {
@@ -263,6 +268,21 @@ namespace Application
         public void HandleError(Exception e)
         {
             MessageBox.Show(e.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+        }
+
+        private void OnWindowClose(object sender, CancelEventArgs e)
+        {
+            if (!_saveData.Saved)
+            {
+               var userDecision = MessageBox.Show("You will lose all saved progress!", "Warning!", MessageBoxButton.OKCancel);
+               if (userDecision != MessageBoxResult.OK)
+               {
+                   e.Cancel = true;
+                    return;
+               }
+            }
+
+            _note.Wipe();
         }
 
     }

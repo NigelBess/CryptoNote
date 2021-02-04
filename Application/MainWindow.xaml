@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="CryptoNote" Height="450" Width="800"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Save}" Modifiers="Ctrl"  Key="S"/>
+        <KeyBinding Command="{Binding Open}" Modifiers="Ctrl"  Key="O"/>
+        <KeyBinding Command="{Binding CreateNew}" Modifiers="Ctrl"  Key="N"/>
+        <KeyBinding Command="{Binding Lock}" Modifiers="Ctrl"  Key="L"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,28 +20,32 @@
         </Grid.RowDefinitions>
         <Menu>
             <MenuItem Header="File">
-                <MenuItem Header="New" Command="{Binding CreateNew}"/>
-                <MenuItem Header="Open" Command ="{Binding Open}"/>
-                <MenuItem Header="Save" Command="{Binding Save}"/>
+                <MenuItem Header="New" Command="{Binding CreateNew}" InputGestureText="Ctrl+N"/>
+                <MenuItem Header="Open" Command ="{Binding Open}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="Save" Command="{Binding Save}" InputGestureText="Ctrl+S"/>
                 <MenuItem Header="Save As" Command="{Binding SaveAs}"/>
                 
                 
             </MenuItem>
             <MenuItem Header="Security">
                 <MenuItem Header="Change Password" Command="{Binding ChangePassword}"/>
-                <MenuItem Header="Lock" Command="{Binding Lock}"/>
+                <MenuItem Header="Lock" Command="{Binding Lock}"  InputGestureText="Ctrl+L"/>
             </MenuItem>
         </Menu>
         <Grid Grid.Row="1" Margin="5">
             
-            <TabControl Visibility="{Binding TextVisibility}">
+            <TabControl >
                 <TabItem Header="{Binding FileName}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                        <TextBox Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" ></TextBox>
-                    </ScrollViewer>
+                    <Grid>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Visibility="{Binding TextVisibility}">
+                            <TextBox Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" ></TextBox>
+                        </ScrollViewer>
+                        <local:ValidationControl Visibility="{Binding ValidationVisibility}"/>
+                    </Grid>
+                    
                 </TabItem>
             </TabControl>
-            <local:ValidationControl Visibility="{Binding ValidationVisibility}"/>
+            
         </Grid>
     </Grid>
 </Window>
