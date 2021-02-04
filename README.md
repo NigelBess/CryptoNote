@@ -19,7 +19,7 @@ Encrypted drives also cost money, and don't provide value beyond that of an exis
 Lots of programs exist to solve the problems mentioned above, but most of them have one thing in common: they are not open-source. A user of one of those programs has no way of knowing what the program is actually doing with their data. The user must trust that the creator of the program is not a malicious actor and that the program actually works as intended. Encryption exists to eliminate the need for trust, so closed-source programs invalidate the security provided by encryption.
 
 # How CryptoNote Works #
-CryptoNote accepts user input (sensitive data) and stores it in memory. When a user saves that data, is is encrypted in memory and saved to the storage device in an encrypted form. Sensitive data is never written to the storage device, only to memory. CryptoNote also erases data from memory whenever possible, but this does not provide security from malicious programs already installed on a computer. CryptoNote's purpose is to allow users to save encrypted data without opening vulnerabilities to data recovery software.
+CryptoNote accepts user input (sensitive data) and stores it in memory. When a user saves that data, is is encrypted in memory and saved to the storage device in an encrypted form. Sensitive data is never written to the storage device, only to memory. CryptoNote also erases data from memory whenever possible, but this does not guarantee security from malicious programs already installed on a computer. CryptoNote's purpose is to allow users to save encrypted data without opening vulnerabilities to data recovery software.
 
 # Encryption Algorithm #
 
