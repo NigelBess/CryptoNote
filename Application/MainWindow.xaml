@@ -31,6 +31,9 @@
                 <MenuItem Header="Change Password" Command="{Binding ChangePassword}"/>
                 <MenuItem Header="Lock" Command="{Binding Lock}"  InputGestureText="Ctrl+L"/>
             </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Settings" Command="{Binding OpenSettingsWindow}"/>
+            </MenuItem>
         </Menu>
         <Grid Grid.Row="1" Margin="5">
             

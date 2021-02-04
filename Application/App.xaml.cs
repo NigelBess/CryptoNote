@@ -11,7 +11,9 @@ namespace Application
         {
             var app = new Main();
             app.ErrorCaught += app.HandleError;
-            app.Start();
+            var startupPath = string.Empty;
+            if (e.Args != null & e.Args.Length > 0) startupPath = e.Args[0];
+            app.Start(startupPath);
         }
     }
 }

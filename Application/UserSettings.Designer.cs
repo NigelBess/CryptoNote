@@ -37,7 +37,7 @@ namespace Application {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1028")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2048")]
         public int Iterations {
             get {
                 return ((int)(this["Iterations"]));

@@ -73,6 +73,7 @@ namespace Application
                 note ??= new CryptoNote(UserSettings.Default.Iterations){OnError = OnError};
                 message = _vulnerableData.Message.GetPlainText();
                 password = _vulnerableData.Password.GetPlainText();
+                note.Iterations = UserSettings.Default.Iterations;
                 note.Encrypt(message, password);
 
             }, message, password);

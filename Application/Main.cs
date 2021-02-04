@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using Protocol;
@@ -15,11 +16,17 @@ namespace Application
         private PasswordWindow _passwordWindow;
         private readonly PasswordWindowViewModel _passwordViewModel = new();
 
+        private readonly SettingsViewModel _settingsViewModel = new ();
+
         private readonly SaveData _saveData = new();
         private readonly NoteLocker _note;
 
         public Main()
         {
+            _settingsViewModel.Settings = UserSettings.Default;
+            _settingsViewModel.Version = Assembly.GetEntryAssembly().GetName().Version.ToString();
+            _settingsViewModel.Protocol = Constants.ProtocolVersion.ToString();
+
             var password = new EncryptedString() {ErrorCaught = HandleError};
             var message = new EncryptedString() { ErrorCaught = HandleError };
             var vulnerableData = new VulnerableData(message,password) ;
@@ -31,18 +38,31 @@ namespace Application
 
             _mainWindow.DataContext = mainWindowViewModel;
             _mainWindow.Closing += OnWindowClose;
+            _mainWindow.Title = "CryptoNote";
 
             SetupPasswordViewModelCommands();
             SetupMainViewModelCommands(mainWindowViewModel);
         }
 
+        
 
 
-        public void Start()
+
+        public void Start(string path)
         {
-            CreateNewFile();
+            if (string.IsNullOrEmpty(path))
+            {
+                CreateNewFile();
+            }
+            else
+            {
+                OpenPath(path);
+            }
+            
             _mainWindow.Show();
         }
+
+        
 
 
         private void SetupPasswordViewModelCommands()
@@ -63,6 +83,20 @@ namespace Application
             });
             viewModel.Open = new Command(Open);
             viewModel.Unlock = new Command(Unlock, o => IsLocked());
+            viewModel.OpenSettingsWindow = new Command(OpenSettingsWindow);
+        }
+
+        private void OpenSettingsWindow()
+        {
+            var settingsWindow = new SettingsWindow {DataContext = _settingsViewModel};
+            settingsWindow.Closing += SettingsWindowClosed;
+            settingsWindow.Activate();
+            settingsWindow.Show();
+        }
+
+        private void SettingsWindowClosed(object sender,CancelEventArgs e)
+        {
+            UserSettings.Default.Save();
         }
 
         private void Unlock(object passwordBoxObj)
@@ -92,22 +126,21 @@ namespace Application
             if (Directory.Exists(UserSettings.Default.LoadFolder))
                 dialog.InitialDirectory = UserSettings.Default.SaveFolder;
             if (!dialog.ShowDialog() ?? false) return;
+            OpenPath(dialog.FileName);
+        }
 
-
-            if (!new Reader().TryRead(dialog.FileName, out var note))
+        private void OpenPath(string path)
+        {
+            if (!new Reader().TryRead(path, out var note))
             {
                 OnError("Unable to open selected file!");
                 return;
             }
 
-            
-
             note.OnError = OnError;
             _note.Load(note);
-            _saveData.FilePath = dialog.FileName;
+            _saveData.FilePath = path;
             _saveData.Saved = true;
-            
-
         }
 
         private bool IsLocked() => _note.IsLocked;

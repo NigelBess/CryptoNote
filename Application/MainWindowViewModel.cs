@@ -92,6 +92,7 @@ namespace Application
         public ICommand SaveAs { get; set; }
         public ICommand Open { get; set; }
         public ICommand Unlock { get; set; }
+        public ICommand OpenSettingsWindow { get; set; }
 
         private void BindFileModel(SaveData model)
         {
@@ -102,8 +103,16 @@ namespace Application
 
         public string FileName => _saveData==null?string.Empty:_saveData.Name+(_saveData.Saved?string.Empty:" *");
 
-        
 
-
+        private string _title;
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                OnChange();
+            }
+        }
     }
 }
