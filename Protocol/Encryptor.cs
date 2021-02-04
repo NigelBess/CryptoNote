@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Security.Cryptography;
+using static Protocol.SensitiveDataHandling;
 
 namespace Protocol
 {
@@ -19,28 +19,16 @@ namespace Protocol
         /// <returns></returns>
         public static byte[] Encrypt(byte[] toEncrypt, byte[] key, byte[] iv)
         {
-            using var aes = new AesManaged();
-            using var encryptor = aes.CreateEncryptor(key, iv);
-            var withValidity = PreProcess(toEncrypt);
-            var outVar = encryptor.PerformCryptography(withValidity);
-            withValidity.Wipe();
-            toEncrypt.Wipe();
+            byte[] outVar = null;
+            SafeExecute(() =>
+            {
+                using var aes = new AesManaged();
+                using var encryptor = aes.CreateEncryptor(key, iv);
+                outVar = encryptor.PerformCryptography(toEncrypt);
+            },toEncrypt);
             return outVar;
         }
 
-        /// <summary>
-        /// Adds validity bytes to the beginning of a message
-        /// </summary>
-        /// <param name="toEncrypt"></param>
-        /// <returns></returns>
-        public static byte[] PreProcess(byte[] toEncrypt)
-        {
-            var validityBytes = Validity.ValidityCheckBytes;
-            var outVar = new byte[validityBytes.Length + toEncrypt.Length];
-            Array.Copy(validityBytes, outVar, validityBytes.Length);
-            Array.Copy(toEncrypt, 0, outVar, validityBytes.Length, toEncrypt.Length);
-            return outVar;
-        }
 
         /// <summary>
         /// derives aes key from password, salt and password iterations

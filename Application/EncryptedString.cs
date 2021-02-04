@@ -32,7 +32,8 @@ namespace Application
         public byte[] GetPlainText()
         {
             if (Cipher == null) return null;
-            if (Decryptor.TryDecrypt(Cipher, _key, _iv, out var plainText, out var exception)) return plainText;
+            var validity = new byte[0];
+            if (Decryptor.TryDecrypt(Cipher, _key, _iv, validity, out var plainText,out var exception)) return plainText;
             OnError(exception);
             return null;
         }

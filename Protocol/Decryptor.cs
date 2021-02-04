@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace Protocol
@@ -16,7 +17,7 @@ namespace Protocol
         /// <param name="iv">aes 256 IV (16 bytes)</param>
         /// <param name="decrypted">decrypted message or null if decryption failed</param>
         /// <returns>true if decryption is successful</returns>
-        public static bool TryDecrypt(byte[] encrypted, byte[] key, byte[] iv, out byte[] decrypted, out Exception exception)
+        public static bool TryDecrypt(byte[] encrypted, byte[] key, byte[] iv, byte[] validity, out byte[] decrypted, out Exception exception)
         {
             decrypted = null;
             exception = null;
@@ -25,11 +26,11 @@ namespace Protocol
             try
             {
                 var decryptionWithValidity = decryptor.PerformCryptography(encrypted);
-                var success = Validity.IsDecryptionValid(decryptionWithValidity);
+                var success = IsDecryptionValid(decryptionWithValidity, validity);
                 if (success)
                 {
-                    decrypted = new byte[decryptionWithValidity.Length - Validity.ValidityCheckBytes.Length];
-                    Array.Copy(decryptionWithValidity,Validity.ValidityCheckBytes.Length,decrypted,0,decrypted.Length);
+                    decrypted = new byte[decryptionWithValidity.Length - validity.Length];
+                    Array.Copy(decryptionWithValidity, validity.Length,decrypted,0,decrypted.Length);
                     decryptionWithValidity.Wipe();
                 }
                 return success;
@@ -41,6 +42,12 @@ namespace Protocol
                 return false;
             }
             
+        }
+
+        public static bool IsDecryptionValid(byte[] decrypted, byte[] validityCheck)
+        {
+            if (decrypted.Length < validityCheck.Length) return false;
+            return !validityCheck.Where((t, i) => decrypted[i] != t).Any();
         }
     }
 }

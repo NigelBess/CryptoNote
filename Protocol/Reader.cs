@@ -1,26 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using static Protocol.Constants;
 
 namespace Protocol
 {
     public class Reader
     {
-        private long index = 0;
+        private long index;
         public bool TryRead(string fileName, out CryptoNote note)
         {
             using var fileStream = File.OpenRead(fileName);
             bool success;
+            index = 0;
             try
             {
                 note = new CryptoNote(0);
                 var fileSize = new FileInfo(fileName).Length;
-                var version = BitConverter.ToUInt16(ReadBytes(fileStream, 2));
+                var version = BitConverter.ToUInt16(ReadBytes(fileStream, VersionLength));
                 if (version != Constants.ProtocolVersion) return false;
-                note.Salt = ReadBytes(fileStream, 32);
+                note.Salt = ReadBytes(fileStream, SaltLength);
                 note.Iterations = BitConverter.ToInt32(ReadBytes(fileStream, 4));
-                note.InitializationVector = ReadBytes(fileStream, 16);
+                note.InitializationVector = ReadBytes(fileStream, IvLength);
+                note.ValidityCheck = ReadBytes(fileStream, ValidityLength);
                 note.Cipher = ReadBytes(fileStream, (int)(fileSize - index));
                 success = true;
             }

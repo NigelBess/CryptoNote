@@ -86,8 +86,8 @@ namespace Application
             var dialog = new OpenFileDialog()
             {
                 AddExtension = true,
-                Filter = $"Crypto Note File | *{Constants.fileExtension}",
-                DefaultExt = Constants.fileExtension,
+                Filter = $"Crypto Note File | *{Constants.FileExtension}",
+                DefaultExt = Constants.FileExtension,
             };
             if (Directory.Exists(UserSettings.Default.LoadFolder))
                 dialog.InitialDirectory = UserSettings.Default.SaveFolder;
@@ -253,8 +253,8 @@ namespace Application
             var dialog = new SaveFileDialog()
             {
                 AddExtension = true,
-                Filter = $"Crypto Note File | *{Constants.fileExtension}",
-                DefaultExt = Constants.fileExtension,
+                Filter = $"Crypto Note File | *{Constants.FileExtension}",
+                DefaultExt = Constants.FileExtension,
                 FileName = defaultFileName,
             };
             if (Directory.Exists(UserSettings.Default.SaveFolder))

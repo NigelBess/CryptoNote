@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text;
 
 namespace Protocol
 {
@@ -23,6 +20,7 @@ namespace Protocol
                 note.Salt,
                 note.Iterations,
                 note.InitializationVector,
+                note.ValidityCheck,
                 note.Cipher,
             };
 
