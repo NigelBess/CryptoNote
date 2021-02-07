@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "CryptoNote"
-#define MyAppVersion "1.0.0.0"
+#define MyAppVersion "1.0.0.1"
 #define MyAppPublisher "Nigel Bess"
 #define MyAppURL "https://github.com/NigelBess/CryptoNote"
 #define MyAppExeName "Application.exe"
@@ -24,7 +24,7 @@ LicenseFile=C:\_Temp\MIT Liscense.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=C:\Dev\CryptoNote\Release\Installer
-OutputBaseFilename=CryptoNote_Setup_1.0.0.0
+OutputBaseFilename=CryptoNote_Setup_1.0.0.1
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
