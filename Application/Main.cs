@@ -131,6 +131,7 @@ namespace Application
 
         private void OpenPath(string path)
         {
+            path = Path.GetFullPath(path);
             if (!new Reader().TryRead(path, out var note))
             {
                 OnError("Unable to open selected file!");

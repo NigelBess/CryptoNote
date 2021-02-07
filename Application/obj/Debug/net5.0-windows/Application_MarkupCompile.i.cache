@@ -1,5 +1,5 @@
 ﻿Application
-1.0.0.0
+1.0.0.1
 
 winexe
 C#
@@ -16,5 +16,5 @@ C:\Dev\CryptoNote\Application\App.xaml
 194641648207
 MainWindow.xaml;PasswordWindow.xaml;SettingsWindow.xaml;ValidationControl.xaml;
 
-False
+True
 

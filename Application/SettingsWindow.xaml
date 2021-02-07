@@ -18,7 +18,7 @@
             </DockPanel>
             <DockPanel>
                 <TextBlock Text="Protocol Version: "/>
-                <TextBlock Text="{Binding Version }"></TextBlock>
+                <TextBlock Text="{Binding Protocol}"></TextBlock>
             </DockPanel>
             <DockPanel>
                 <TextBlock Text="Password Iterations: "/>
